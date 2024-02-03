@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'package:sqflite/sqflite.dart';
+import 'database_helper.dart';
 void main() {
-    var contest_url = return_contest_url(135);
+    var contest_url = return_contest_url(M,135);
     print("$contest_url");
     Map<String, String>  problem_url_map = {};
-    search_problem_url(135, contest_url, problem_url_map);
+    search_problem_url(M, 135, contest_url, problem_url_map);
     //download_file(problem_url_map.get(135A));
     var content_unicode = search_word_in_sentence("omc135A.html",　"const content");
     content = unicode_to_readable(content_unicode);
@@ -12,35 +14,109 @@ void main() {
 
 }
 
-String return_contest_url(int contest_n) {
-    if (contest_n < 10) {
-        String url = "https://onlinemathcontest.com/contests/omc00" + contest_n.toString() + "/tasks/";
-        return url;
-    } else if contest_n < 100 {
-        String url = "https://onlinemathcontest.com/contests/omc0" + contest_n.toString() + "/tasks/";
-        return url;
-    } else {
-        String url = "https://onlinemathcontest.com/contests/omc" + contest_n.toString() + "/tasks/";
-        return url;
+String return_contest_url(String mark, int contest_n) {
+		if(mark == B){
+				if (contest_n < 10) {
+        		String url = "https://onlinemathcontest.com/contests/omcb00" + contest_n.toString() + "/tasks/";
+        		return url;
+    		} else if contest_n < 100 {
+        		String url = "https://onlinemathcontest.com/contests/omcb0" + contest_n.toString() + "/tasks/";
+        		return url;
+    		} else {
+        		String url = "https://onlinemathcontest.com/contests/omcb" + contest_n.toString() + "/tasks/";
+        		return url;
+    		}
+		}else if(mark == M){
+    		if (contest_n < 10) {
+        		String url = "https://onlinemathcontest.com/contests/omc00" + contest_n.toString() + "/tasks/";
+        		return url;
+    		} else if contest_n < 100 {
+        		String url = "https://onlinemathcontest.com/contests/omc0" + contest_n.toString() + "/tasks/";
+        		return url;
+    		} else {
+        		String url = "https://onlinemathcontest.com/contests/omc" + contest_n.toString() + "/tasks/";
+        		return url;
+    		}
+		}else if(mark == E){
+			if (contest_n < 10) {
+            String url = "https://onlinemathcontest.com/contests/omce00" + contest_n.toString() + "/tasks/";
+            return url;
+        } else if contest_n < 100 {
+            String url = "https://onlinemathcontest.com/contests/omce0" + contest_n.toString() + "/tasks/";
+            return url;
+        } else {
+            String url = "https://onlinemathcontest.com/contests/omce" + contest_n.toString() + "/tasks/";
+            return url;
+        }
     }
 }
 
-void search_problem_url(contest_n: i32, contest_url: String, mut problem_url_map:HashMap<String,String>) {
+class ProblemDatabase {
+	String sentences;
+	String problem_name;
+	String contest_category;
+	String problem_url;
+	int problem_point;
+
+	ProblemDatabase(this.problem_name, this.contest_category, this.problem_url);
+
+}
+
+void search_problem_url(String mark, int contest_n, String contest_url,List<ProblemDatabase> problem_data_set) async {
     int count = 0;
     String contest_name = "Hello! What are you doing here?";
-
-
-    if (contest_n < 10) {
-        contest_name = "../../omc_files/omc00" + contest_n + ".html";
-    } else if (contest_n < 100) {
-        contest_name = "../../omc_files/omc0" + contest_n + "html";
-    } else {
-        contest_name = "../../omc_files/omc" + contest_n + ".html";
-    }
+		String contest_category = "M";
+		if(mark == B){
+				contest_category = "B"
+    		if (contest_n < 10) {
+        		contest_name = "../../omc_files/omcb00" + contest_n + ".html";
+   			} else if (contest_n < 100) {
+        		contest_name = "../../omc_files/omcb0" + contest_n + "html";
+    		} else {
+        		contest_name = "../../omc_files/omcb" + contest_n + ".html";
+    		}
+		}else if(mark == M){
+				if (contest_n < 10) {
+            contest_name = "../../omc_files/omc00" + contest_n + ".html";
+        } else if (contest_n < 100) {
+            contest_name = "../../omc_files/omc0" + contest_n + "html";
+        } else {
+            contest_name = "../../omc_files/omc" + contest_n + ".html";
+        }
+		}else if(mark == E){
+				contest_category = "E"
+				if (contest_n < 10) {
+            contest_name = "../../omc_files/omce00" + contest_n + ".html";
+        } else if (contest_n < 100) {
+            contest_name = "../../omc_files/omce0" + contest_n + "html";
+        } else {
+            contest_name = "../../omc_files/omce" + contest_n + ".html";
+        }
+		}
     print("$contest_name");
     
-    
-    if var Ok(lines) = read_lines(contest_name) {
+		var file = File(contest_name);
+		try {
+			var lines = await file.readAsLines();
+
+			for (var line in lines) {
+				int index = line.indexOf(contest_url);
+				if(index != -1) {
+					String substring = mainString.substring(index);
+					String problem_url = substring.substring(0, substring.length-2)
+					String end_char = problem_url[problem_url.length - 1];
+						if(end_char != "\"") {
+							int problem_alphabet_int = 65 + count;
+							String problem_alphabet = String.fromCharCode(problem_alphabet_int);
+							String problem_name = contest_n.toString() + problem_alphabet;
+							problem_data = ProblemDatabase(problem_name: problem_name, contest_category: contest_category, problem_url: problem_url);
+							problem_data_set.add(problem_data);
+			} 
+		}	catch (e) {
+				print('some error occured.');
+		}
+		
+/*    if var Ok(lines) = read_lines(contest_name) {
         print("file reading...");
         for line in lines {
             if var Ok(ip) = line {
@@ -74,7 +150,7 @@ where P: AsRef<Path>, {
     var file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
-/*
+
 #[tokio::main]
 async fn download_file(url: String) -> Result<()> {
     var filename = url.split("/").last().unwrap();
