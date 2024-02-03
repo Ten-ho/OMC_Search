@@ -6,7 +6,7 @@ void main() {
 			initialRoute: '/',
 			routes: {
 				'/': (context) => const MyApp(),
-				'/solvers': (context) => const PageAboutSolvers(),
+				'/searchs': (context) => const PageAboutSearchResults(),
 			},
 		),
 	);
@@ -61,13 +61,16 @@ class MySearchBar extends StatelessWidget{
 						prefixIcon: Icon(Icons.search),
 						border: InputBorder.none,
 					),
+					onSubmitted: (_) {
+						Navigator.of(context).pushNamed("/searchs");
+					},
 				),
 			),
 		);
 	}
 }
 
-class MySearchBar_legacy extends StatelessWidget{
+/*class MySearchBar_legacy extends StatelessWidget{
 	const MySearchBar_legacy({super.key});
 	
 	@override
@@ -82,10 +85,10 @@ class MySearchBar_legacy extends StatelessWidget{
 			leading: const Icon(Icons.search),
 		);
 	}
-}
+}*/
 
 
-class MakeCard extends StatelessWidget{
+/*class MakeCard extends StatelessWidget{
 	const MakeCard({super.key});
 
 	@override
@@ -123,25 +126,37 @@ class MakeCard extends StatelessWidget{
 			),
 		);
 	}
-}
+}*/
 
-class PageAboutSolvers extends StatelessWidget {
-	const PageAboutSolvers({super.key});
+class PageAboutSearchResults extends StatelessWidget {
+	const PageAboutSearchResults({super.key});
 
 	@override
 	Widget build(BuildContext context){
 		return Scaffold(
 			appBar: AppBar(
-				title: const Text('About Solvers'),
+				title: const Text('Search Result:'),
 			),
-			body: Center(
-				child: ElevatedButton(
-					onPressed: () {
-						//navigate to the second screen when tapped.
-						Navigator.pop(context);
-					},
-					child: const Text('back to the Home'),
-				),
+			body: Column(
+				children: [
+					ElevatedButton(
+						onPressed: () {
+							//navigate to the second screen when tapped.
+							Navigator.pop(context);
+						},
+						child: Text('tentative'),
+					),
+					ListView.builder(
+						padding: const EdgeInsets.all(8),
+						itemCount: 4,
+						itemBuilder: (BuildContext context, int index) {
+							return Container(
+								height: 50,
+								child: Placeholder(),
+							);
+						},
+					),
+				],
 			),
 		);
 	}
