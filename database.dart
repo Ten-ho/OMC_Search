@@ -1,12 +1,11 @@
 import 'dart:io';
-aaaa
 import 'package:sqflite/sqflite.dart';
 import 'database_helper.dart';
 void main() {
     var contest_url = return_contest_url(M,135);
     print("$contest_url");
-    Map<String, String>  problem_url_map = {};
-    search_problem_url(M, 135, contest_url, problem_url_map);
+    List<ProblemDatabase>  problem_data_set = {};
+    search_problem_url(M, 135, contest_url, problem_data_set);
     //download_file(problem_url_map.get(135A));
     var content_unicode = search_word_in_sentence("omc135A.html",　"const content");
     content = unicode_to_readable(content_unicode);
@@ -53,7 +52,7 @@ String return_contest_url(String mark, int contest_n) {
 }
 
 class ProblemDatabase {
-	String sentences;
+	String problem_text;
 	String problem_name;
 	String contest_category;
 	String problem_url;
@@ -72,7 +71,7 @@ void search_problem_url(String mark, int contest_n, String contest_url,List<Prob
     		if (contest_n < 10) {
         		contest_name = "../../omc_files/omcb00" + contest_n + ".html";
    			} else if (contest_n < 100) {
-        		contest_name = "../../omc_files/omcb0" + contest_n + "html";
+        		contest_name = "../../omc_files/omcb0" + contest_n + ".html";
     		} else {
         		contest_name = "../../omc_files/omcb" + contest_n + ".html";
     		}
@@ -80,7 +79,7 @@ void search_problem_url(String mark, int contest_n, String contest_url,List<Prob
 				if (contest_n < 10) {
             contest_name = "../../omc_files/omc00" + contest_n + ".html";
         } else if (contest_n < 100) {
-            contest_name = "../../omc_files/omc0" + contest_n + "html";
+            contest_name = "../../omc_files/omc0" + contest_n + ".html";
         } else {
             contest_name = "../../omc_files/omc" + contest_n + ".html";
         }
@@ -89,7 +88,7 @@ void search_problem_url(String mark, int contest_n, String contest_url,List<Prob
 				if (contest_n < 10) {
             contest_name = "../../omc_files/omce00" + contest_n + ".html";
         } else if (contest_n < 100) {
-            contest_name = "../../omc_files/omce0" + contest_n + "html";
+            contest_name = "../../omc_files/omce0" + contest_n + ".html";
         } else {
             contest_name = "../../omc_files/omce" + contest_n + ".html";
         }
@@ -98,25 +97,29 @@ void search_problem_url(String mark, int contest_n, String contest_url,List<Prob
     
 		var file = File(contest_name);
 		try {
-			var lines = await file.readAsLines();
+			var lines = await file.readAsLines().then((lines) => lines.reversed);
 
-			for (var line in lines) {
+			var last100Lines = reversedLines.take(100).toList();
+
+			for (var line in last100Lines.reversed) {
 				int index = line.indexOf(contest_url);
 				if(index != -1) {
 					String substring = mainString.substring(index);
 					String problem_url = substring.substring(0, substring.length-2)
 					String end_char = problem_url[problem_url.length - 1];
-						if(end_char != "\"") {
-							int problem_alphabet_int = 65 + count;
-							String problem_alphabet = String.fromCharCode(problem_alphabet_int);
-							String problem_name = contest_n.toString() + problem_alphabet;
-							problem_data = ProblemDatabase(problem_name: problem_name, contest_category: contest_category, problem_url: problem_url);
-							problem_data_set.add(problem_data);
-			} 
+					if(end_char != "\"") {
+						int problem_alphabet_int = 65 + count;
+						String problem_alphabet = String.fromCharCode(problem_alphabet_int);
+						String problem_name = contest_n.toString() + problem_alphabet;
+						problem_data = ProblemDatabase(problem_name: problem_name, contest_category: contest_category, problem_url: problem_url);
+						problem_data_set.add(problem_data);
+					}
+				}
+			}
 		}	catch (e) {
 				print('some error occured.');
 		}
-		
+}	
 /*    if var Ok(lines) = read_lines(contest_name) {
         print("file reading...");
         for line in lines {
@@ -163,6 +166,56 @@ async fn download_file(url: String) -> Result<()> {
     Ok(())
 }
 */
+String search_word_in_sentence(String filepath, List<PersonDatabase> problem_data_set) {
+	var file = File(filepath);
+
+	try {
+		var lines = await file.readAsLines();
+
+		for (var line in lines) {
+			int index = line.indexOf('const content');
+			if (index != -1) {
+				var problem_text = line.substring(17);
+				for (int i=0; i<problem_text.length; i++) {
+					if(problem_text[i] == '\$' and problem_text[i+1] == '\$') {
+						int count = 3;
+						while(true) {
+							if(problem_text[i+count] == '\$' and problem_text[i+count+1] == '\$') {
+								problem_text = problem_text.substring(0,i-1) + problem_text.substring(i+2,i+count) + problem_text.substring(i+count+3);
+								break;
+							}
+							count += 1;
+						}
+						i = i+count-3;
+					} else if(problem_text[i] == '\$') {
+						int count = 2;
+            while(true) {
+              if(problem_text[i+count] == '\$') {
+                problem_text = problem_text.substring(0,i-1) + problem_text.substring(i+1,i+count) + problem_text.substring(i+count+2);
+                break;
+              }
+              count += 1;
+            }
+            i = i+count-2;
+					}
+				}
+				problem_data_set.problem_text = problem_text;
+			}
+		}
+	} catch (e) {
+		print('some error occured.');
+	}
+}
+
+
+
+
+
+
+
+
+
+
 fn search_word_in_sentence(filepath: String, search_word: String) -> String{
     if var Ok(lines) = read_lines(filepath) {
         for line in lines {
