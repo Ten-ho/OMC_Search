@@ -5,10 +5,7 @@ void main() {
     var contest_url = return_contest_url(M,135);
     print("$contest_url");
     List<ProblemDatabase>  problem_data_set = {};
-    search_problem_url(M, 135, contest_url, problem_data_set);
-    //download_file(problem_url_map.get(135A));
-    var content_unicode = search_word_in_sentence("omc135A.html",　"const content");
-    content = unicode_to_readable(content_unicode);
+    make_problem_data_set(M, 135, contest_url, problem_data_set);
     print("This is content_readable:$content");
 
 
@@ -62,7 +59,7 @@ class ProblemDatabase {
 
 }
 
-void search_problem_url(String mark, int contest_n, String contest_url,List<ProblemDatabase> problem_data_set) async {
+void make_problem_data_set(String mark, int contest_n, String contest_url,List<ProblemDatabase> problem_data_set) async {
     int count = 0;
     String contest_name = "Hello! What are you doing here?";
 		String contest_category = "M";
@@ -112,7 +109,9 @@ void search_problem_url(String mark, int contest_n, String contest_url,List<Prob
 						String problem_alphabet = String.fromCharCode(problem_alphabet_int);
 						String problem_name = contest_n.toString() + problem_alphabet;
 						problem_data = ProblemDatabase(problem_name: problem_name, contest_category: contest_category, problem_url: problem_url);
-						problem_data_set.add(problem_data);
+						String filepath = contest_name.substring(0, contest_name.length-5) + problem_alphabet + ".html";
+						search_word_in_sentences(filepath, problem_data);
+						problem_data_set.add(probelm_data);
 					}
 				}
 			}
@@ -120,6 +119,59 @@ void search_problem_url(String mark, int contest_n, String contest_url,List<Prob
 				print('some error occured.');
 		}
 }	
+
+void search_word_in_sentence(String filepath, ProblemDatabase problem_data) {
+	var file = File(filepath);
+
+	try {
+		var lines = await file.readAsLines();
+
+		for (var line in lines) {
+			int index_text = line.indexOf('const content');
+			if (index_text != -1) {
+				var problem_text = line.substring(17, line.string - 2);
+				for (int i=0; i<problem_text.length; i++) {
+					if(problem_text[i] == '\$' and problem_text[i+1] == '\$') {
+						int count = 3;
+						while(true) {
+							if(problem_text[i+count] == '\$' and problem_text[i+count+1] == '\$') {
+								problem_text = problem_text.substring(0,i-1) + problem_text.substring(i+2,i+count) + problem_text.substring(i+count+3);
+								break;
+							}
+							count += 1;
+						}
+						i = i+count-3;
+					} else if(problem_text[i] == '\$') {
+						int count = 2;
+            while(true) {
+              if(problem_text[i+count] == '\$') {
+                problem_text = problem_text.substring(0,i-1) + problem_text.substring(i+1,i+count) + problem_text.substring(i+count+2);
+                break;
+              }
+              count += 1;
+            }
+            i = i+count-2;
+					}
+				}
+				problem_data.problem_text = problem_text;
+			} else if (line.contains('点数:')) {
+				var problem_point = line.substring(7, line.length-4);
+				problem_data.problem_point = int.parse(problem_point);
+		}
+	} catch (e) {
+		print('some error occured.');
+	}
+}
+
+
+
+
+
+
+
+
+
+
 /*    if var Ok(lines) = read_lines(contest_name) {
         print("file reading...");
         for line in lines {
@@ -165,56 +217,6 @@ async fn download_file(url: String) -> Result<()> {
 
     Ok(())
 }
-*/
-String search_word_in_sentence(String filepath, List<PersonDatabase> problem_data_set) {
-	var file = File(filepath);
-
-	try {
-		var lines = await file.readAsLines();
-
-		for (var line in lines) {
-			int index = line.indexOf('const content');
-			if (index != -1) {
-				var problem_text = line.substring(17);
-				for (int i=0; i<problem_text.length; i++) {
-					if(problem_text[i] == '\$' and problem_text[i+1] == '\$') {
-						int count = 3;
-						while(true) {
-							if(problem_text[i+count] == '\$' and problem_text[i+count+1] == '\$') {
-								problem_text = problem_text.substring(0,i-1) + problem_text.substring(i+2,i+count) + problem_text.substring(i+count+3);
-								break;
-							}
-							count += 1;
-						}
-						i = i+count-3;
-					} else if(problem_text[i] == '\$') {
-						int count = 2;
-            while(true) {
-              if(problem_text[i+count] == '\$') {
-                problem_text = problem_text.substring(0,i-1) + problem_text.substring(i+1,i+count) + problem_text.substring(i+count+2);
-                break;
-              }
-              count += 1;
-            }
-            i = i+count-2;
-					}
-				}
-				problem_data_set.problem_text = problem_text;
-			}
-		}
-	} catch (e) {
-		print('some error occured.');
-	}
-}
-
-
-
-
-
-
-
-
-
 
 fn search_word_in_sentence(filepath: String, search_word: String) -> String{
     if var Ok(lines) = read_lines(filepath) {
@@ -284,3 +286,4 @@ String unicode_to_readable(content: String){
     }
     return content_readable
 }
+*/
