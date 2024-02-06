@@ -64,30 +64,30 @@ void make_problem_data_set(String mark, int contest_n, String contest_url,List<P
     String contest_name = "Hello! What are you doing here?";
 		String contest_category = "M";
 		if(mark == B){
-				contest_category = "B"
+				contest_category = "B";
     		if (contest_n < 10) {
-        		contest_name = "../../omc_files/omcb00" + contest_n + ".html";
+        		contest_name = "./omc_files/omcb00" + contest_n + ".html";
    			} else if (contest_n < 100) {
-        		contest_name = "../../omc_files/omcb0" + contest_n + ".html";
+        		contest_name = "./omc_files/omcb0" + contest_n + ".html";
     		} else {
-        		contest_name = "../../omc_files/omcb" + contest_n + ".html";
+        		contest_name = "./omc_files/omcb" + contest_n + ".html";
     		}
 		}else if(mark == M){
 				if (contest_n < 10) {
-            contest_name = "../../omc_files/omc00" + contest_n + ".html";
+            contest_name = "./omc_files/omc00" + contest_n + ".html";
         } else if (contest_n < 100) {
-            contest_name = "../../omc_files/omc0" + contest_n + ".html";
+            contest_name = "./omc_files/omc0" + contest_n + ".html";
         } else {
-            contest_name = "../../omc_files/omc" + contest_n + ".html";
+            contest_name = "./omc_files/omc" + contest_n + ".html";
         }
 		}else if(mark == E){
-				contest_category = "E"
+				contest_category = "E";
 				if (contest_n < 10) {
-            contest_name = "../../omc_files/omce00" + contest_n + ".html";
+            contest_name = "./omc_files/omce00" + contest_n + ".html";
         } else if (contest_n < 100) {
-            contest_name = "../../omc_files/omce0" + contest_n + ".html";
+            contest_name = "./omc_files/omce0" + contest_n + ".html";
         } else {
-            contest_name = "../../omc_files/omce" + contest_n + ".html";
+            contest_name = "./omc_files/omce" + contest_n + ".html";
         }
 		}
     print("$contest_name");
