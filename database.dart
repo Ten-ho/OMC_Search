@@ -1,44 +1,45 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
 import 'package:sqflite/sqflite.dart';
-import 'database_helper.dart';
+import 'package:http/http.dart' as http;
 void main() {
-    var contest_url = return_contest_url(M,135);
+    var contest_url = return_contest_url("M", 135);
     print("$contest_url");
-    List<ProblemDatabase>  problem_data_set = {};
-    make_problem_data_set(M, 135, contest_url, problem_data_set);
-    print("This is content_readable:$content");
+    var problem_data_set = List<ProblemDatabase>.empty();
+    make_problem_data_set("M", 135, contest_url, problem_data_set);
 
 
 }
 
 String return_contest_url(String mark, int contest_n) {
-		if(mark == B){
+		if(mark == "B"){
 				if (contest_n < 10) {
         		String url = "https://onlinemathcontest.com/contests/omcb00" + contest_n.toString() + "/tasks/";
         		return url;
-    		} else if contest_n < 100 {
+    		} else if (contest_n < 100) {
         		String url = "https://onlinemathcontest.com/contests/omcb0" + contest_n.toString() + "/tasks/";
         		return url;
     		} else {
         		String url = "https://onlinemathcontest.com/contests/omcb" + contest_n.toString() + "/tasks/";
         		return url;
     		}
-		}else if(mark == M){
+		}else if(mark == "M"){
     		if (contest_n < 10) {
         		String url = "https://onlinemathcontest.com/contests/omc00" + contest_n.toString() + "/tasks/";
         		return url;
-    		} else if contest_n < 100 {
+    		} else if (contest_n < 100) {
         		String url = "https://onlinemathcontest.com/contests/omc0" + contest_n.toString() + "/tasks/";
         		return url;
     		} else {
         		String url = "https://onlinemathcontest.com/contests/omc" + contest_n.toString() + "/tasks/";
         		return url;
     		}
-		}else if(mark == E){
+		}else if(mark == "E"){
 			if (contest_n < 10) {
             String url = "https://onlinemathcontest.com/contests/omce00" + contest_n.toString() + "/tasks/";
             return url;
-        } else if contest_n < 100 {
+        } else if (contest_n < 100) {
             String url = "https://onlinemathcontest.com/contests/omce0" + contest_n.toString() + "/tasks/";
             return url;
         } else {
@@ -46,14 +47,15 @@ String return_contest_url(String mark, int contest_n) {
             return url;
         }
     }
+		return "Hello.";
 }
 
 class ProblemDatabase {
-	String problem_text;
-	String problem_name;
-	String contest_category;
-	String problem_url;
-	int problem_point;
+	String problem_text = "online";
+	String problem_name = "math";
+	String contest_category = "contest";
+	String problem_url = "problems";
+	int problem_point = 100;
 
 	ProblemDatabase(this.problem_name, this.contest_category, this.problem_url);
 
@@ -63,78 +65,107 @@ void make_problem_data_set(String mark, int contest_n, String contest_url,List<P
     int count = 0;
     String contest_name = "Hello! What are you doing here?";
 		String contest_category = "M";
-		if(mark == B){
+		if(mark == "B"){
 				contest_category = "B";
     		if (contest_n < 10) {
-        		contest_name = "./omc_files/omcb00" + contest_n + ".html";
+        		contest_name = "./omc_files/omcb00" + contest_n.toString() + ".html";
    			} else if (contest_n < 100) {
-        		contest_name = "./omc_files/omcb0" + contest_n + ".html";
+        		contest_name = "./omc_files/omcb0" + contest_n.toString() + ".html";
     		} else {
-        		contest_name = "./omc_files/omcb" + contest_n + ".html";
+        		contest_name = "./omc_files/omcb" + contest_n.toString() + ".html";
     		}
-		}else if(mark == M){
+		}else if(mark == "M"){
 				if (contest_n < 10) {
-            contest_name = "./omc_files/omc00" + contest_n + ".html";
+            contest_name = "./omc_files/omc00" + contest_n.toString() + ".html";
         } else if (contest_n < 100) {
-            contest_name = "./omc_files/omc0" + contest_n + ".html";
+            contest_name = "./omc_files/omc0" + contest_n.toString()  + ".html";
         } else {
-            contest_name = "./omc_files/omc" + contest_n + ".html";
+            contest_name = "/home/tenho/FlutterWorkspace/practice/omc_plusplus/lib/omc" + contest_n.toString()  + ".html";
         }
-		}else if(mark == E){
+		}else if(mark == "E"){
 				contest_category = "E";
 				if (contest_n < 10) {
-            contest_name = "./omc_files/omce00" + contest_n + ".html";
+            contest_name = "./omc_files/omce00" + contest_n.toString()  + ".html";
         } else if (contest_n < 100) {
-            contest_name = "./omc_files/omce0" + contest_n + ".html";
+            contest_name = "./omc_files/omce0" + contest_n.toString()  + ".html";
         } else {
-            contest_name = "./omc_files/omce" + contest_n + ".html";
+            contest_name = "./omc_files/omce" + contest_n.toString()  + ".html";
         }
 		}
     print("$contest_name");
     
 		var file = File(contest_name);
 		try {
-			var lines = await file.readAsLines().then((lines) => lines.reversed);
+			var lines = await file.readAsLines();
 
-			var last100Lines = reversedLines.take(100).toList();
+			print("file reading...");
 
-			for (var line in last100Lines.reversed) {
+			for (var line in lines) {
 				int index = line.indexOf(contest_url);
 				if(index != -1) {
-					String substring = mainString.substring(index);
-					String problem_url = substring.substring(0, substring.length-2)
+					String substring = line.substring(index);
+					String problem_url = substring.substring(0, substring.length-2);
 					String end_char = problem_url[problem_url.length - 1];
 					if(end_char != "\"") {
 						int problem_alphabet_int = 65 + count;
 						String problem_alphabet = String.fromCharCode(problem_alphabet_int);
 						String problem_name = contest_n.toString() + problem_alphabet;
-						problem_data = ProblemDatabase(problem_name: problem_name, contest_category: contest_category, problem_url: problem_url);
+						var problem_data = ProblemDatabase(problem_name, contest_category, problem_url);
 						String filepath = contest_name.substring(0, contest_name.length-5) + problem_alphabet + ".html";
-						search_word_in_sentences(filepath, problem_data);
-						problem_data_set.add(probelm_data);
+						print('$filepath');
+						//call_shellscript(filepath, problem_url);
+						search_word_in_sentence(filepath, problem_data);
+						problem_data_set.add(problem_data);
 					}
 				}
 			}
 		}	catch (e) {
-				print('some error occured.');
+				print('error: $e');
 		}
 }	
 
-void search_word_in_sentence(String filepath, ProblemDatabase problem_data) {
+/*file_download(String filepath, String problem_url) async {
+	var url = Uri.parse(problem_url);
+	print('url:$url');
+	try {
+		final response = await http.get(url);
+		print('succeed in getting http');
+		if(response.statusCode == 200) {
+			final file = File(filepath);
+			await file.writeAsBytes(response.bodyBytes);
+		} else {
+			print('err0r: ${response.reasonPhrase}');
+		}
+	} catch (e) {
+		print('error: $e');
+	}
+}*/
+
+void call_shellscript(String filepath, String problem_url) async {
+	var result = await Process.run('sh', ['/home/tenho/FlutterWorkspace/practice/omc_plusplus/lib/wget_omc_problem.sh', problem_url, filepath]);
+	print(result.stdout);
+	print(result.stderr);
+}
+
+
+void search_word_in_sentence(String filepath, ProblemDatabase problem_data) async {
 	var file = File(filepath);
+	print('filepath:$filepath');
 
 	try {
 		var lines = await file.readAsLines();
 
+		print('file reading...2');
 		for (var line in lines) {
 			int index_text = line.indexOf('const content');
 			if (index_text != -1) {
-				var problem_text = line.substring(17, line.string - 2);
+				String problem_text_unicode = line.substring(index_text+17, line.length - 2);
+				String problem_text = jsonDecode('"$problem_text_unicode"');
 				for (int i=0; i<problem_text.length; i++) {
-					if(problem_text[i] == '\$' and problem_text[i+1] == '\$') {
+					if(problem_text[i] == '\$' && problem_text[i+1] == '\$') {
 						int count = 3;
 						while(true) {
-							if(problem_text[i+count] == '\$' and problem_text[i+count+1] == '\$') {
+							if(problem_text[i+count] == '\$' && problem_text[i+count+1] == '\$') {
 								problem_text = problem_text.substring(0,i-1) + problem_text.substring(i+2,i+count) + problem_text.substring(i+count+3);
 								break;
 							}
@@ -153,13 +184,18 @@ void search_word_in_sentence(String filepath, ProblemDatabase problem_data) {
             i = i+count-2;
 					}
 				}
+				print('$problem_text');
 				problem_data.problem_text = problem_text;
 			} else if (line.contains('点数:')) {
-				var problem_point = line.substring(7, line.length-4);
-				problem_data.problem_point = int.parse(problem_point);
+				var line_point = line.indexOf('点数:');
+				var problem_point = line.substring(line_point+4, line.length-4);
+				print('$line');
+				print('$problem_point');
+				problem_data.problem_point = int.parse(problem_point.toString());
+			}
 		}
 	} catch (e) {
-		print('some error occured.');
+		print('some error occured:$e');
 	}
 }
 
